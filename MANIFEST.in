@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include multiple_discount_and_uom *.css
+recursive-include multiple_discount_and_uom *.csv
+recursive-include multiple_discount_and_uom *.html
+recursive-include multiple_discount_and_uom *.ico
+recursive-include multiple_discount_and_uom *.js
+recursive-include multiple_discount_and_uom *.json
+recursive-include multiple_discount_and_uom *.md
+recursive-include multiple_discount_and_uom *.png
+recursive-include multiple_discount_and_uom *.py
+recursive-include multiple_discount_and_uom *.svg
+recursive-include multiple_discount_and_uom *.txt
+recursive-exclude multiple_discount_and_uom *.pyc
