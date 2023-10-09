@@ -1,0 +1,7 @@
+.DS_Store
+*.pyc
+*.egg-info
+*.swp
+tags
+multiple_discount_and_uom/docs/current
+node_modules/
