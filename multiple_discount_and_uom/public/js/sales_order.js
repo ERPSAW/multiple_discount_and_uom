@@ -13,6 +13,7 @@ frappe.ui.form.on("Sales Order Item", {
     },
     item_code:function(frm,cdt,cdn){
         var child=locals[cdt][cdn]
+        var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
         if(child.item_code){
             frappe.call({
                 method:"multiple_discount_and_uom.overrides.sales_invoice.get_uom_item_list",
@@ -21,25 +22,28 @@ frappe.ui.form.on("Sales Order Item", {
                 },
                 callback:function(r){
                     if(r.message){
-                        var uom_list=[];
-                        for(var i=0; i<r.message.length; i++){
-                            uom_list.push(r.message[i])
+                        if(r.message){
+                            child.alternate_uom=r.message
+                            grid_row.refresh_field("alternate_uom");
+                            set_atlternate_qty(frm,cdt,cdn)
                         }
-                        uom_list.push('')
-
-                        frm.set_query("alternate_uom", "items", function(doc, cdt, cdn) {
-                            return {
-                                filters: {
-                                    name: ['in',uom_list],
-                                }
-                            };
-                        });
                     }
                 }
             })
         }
     },
     alternate_uom:function(frm,cdt,cdn){
+        set_atlternate_qty(frm,cdt,cdn)
+    },
+    alternate_qty:function(frm,cdt,cdn){
+        var child=locals[cdt][cdn]
+        var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
+        if(child.alternate_qty && child.alternate_uom_conversion_factor){
+            child.qty = child.alternate_qty *child.alternate_uom_conversion_factor
+            grid_row.refresh_field("qty");
+        }
+    },
+    qty:function(frm,cdt,cdn){
         var child=locals[cdt][cdn]
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
         if(child.alternate_uom){
@@ -52,25 +56,45 @@ frappe.ui.form.on("Sales Order Item", {
                 callback:function(r){
                     if(r.message){
                         child.alternate_uom_conversion_factor=r.message
-                        // child.alternate_qty = r.message*child.qty
+                        child.alternate_qty = r.message*child.qty
                         grid_row.refresh_field("alternate_uom_conversion_factor");
-                        // grid_row.refresh_field("alternate_qty");
+                        grid_row.refresh_field("alternate_qty");
 
                     }
                 }
             })
         }
-    },
-    alternate_qty:function(frm,cdt,cdn){
-        var child=locals[cdt][cdn]
-        var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
-        if(child.alternate_qty && child.alternate_uom_conversion_factor){
-            child.qty = child.alternate_qty *child.alternate_uom_conversion_factor
-            grid_row.refresh_field("qty");
-        }
     }
 
 })
+
+function set_atlternate_qty(frm,cdt,cdn){
+    var child=locals[cdt][cdn]
+    var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
+    if(child.alternate_uom){
+        frappe.call({
+            method:"multiple_discount_and_uom.overrides.sales_invoice.get_conversion_factor",
+            args:{
+                item_code:child.item_code,
+                uom:child.alternate_uom
+            },
+            callback:function(r){
+                if(r.message){
+                    child.alternate_uom_conversion_factor=r.message
+                    if(child.qty>0){
+                        child.alternate_qty = r.message*child.qty
+                    }
+                    else{
+                        child.alternate_qty = r.message
+                    }
+                    grid_row.refresh_field("alternate_uom_conversion_factor");
+                    grid_row.refresh_field("alternate_qty");
+
+                }
+            }
+        })
+    }
+}
 
 function set_discount_amount(frm,cdt,cdn,child){
     var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];

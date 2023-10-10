@@ -2,10 +2,11 @@ import frappe
 
 @frappe.whitelist()
 def get_uom_item_list(item_code):
-    secondary_uom_list=[]
+    secondary_uom_list=None
     item_doc = frappe.get_doc('Item', item_code)
     for uom in item_doc.uoms:
-        secondary_uom_list.append(uom.uom)
+        if uom.secondary_uom==1:
+            secondary_uom_list=uom.uom
     return secondary_uom_list
 
 @frappe.whitelist()
