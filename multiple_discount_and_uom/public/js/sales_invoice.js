@@ -56,7 +56,7 @@ frappe.ui.form.on("Sales Invoice Item", {
                 callback:function(r){
                     if(r.message){
                         child.alternate_uom_conversion_factor=r.message
-                        child.alternate_qty = r.message*child.qty
+                        child.alternate_qty = child.qty/r.message
                         grid_row.refresh_field("alternate_uom_conversion_factor");
                         grid_row.refresh_field("alternate_qty");
 
@@ -82,10 +82,10 @@ function set_atlternate_qty(frm,cdt,cdn){
                 if(r.message){
                     child.alternate_uom_conversion_factor=r.message
                     if(child.qty>0){
-                        child.alternate_qty = r.message*child.qty
+                        child.alternate_qty = child.qty/r.message
                     }
                     else{
-                        child.alternate_qty = r.message
+                        child.alternate_qty = 1/r.message
                     }
                     grid_row.refresh_field("alternate_uom_conversion_factor");
                     grid_row.refresh_field("alternate_qty");
