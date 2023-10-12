@@ -3,25 +3,28 @@ frappe.ui.form.on("Sales Order Item", {
         var child=locals[cdt][cdn];
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
         if(child.discount_2){
-            var amount_after_discount_2=0
-            var discount_amount =0
-            var rate =0 
-            var discount_per=0
-            amount_after_discount_2=child.amount_after_discount_1-((child.amount_after_discount_1*child.discount_2)/100)
-            child.amount_after_discount_2=amount_after_discount_2
-            child.rate=amount_after_discount_2
+            child.discount_amount_2=((child.amount_after_discount_1*child.discount_2)/100)
+            grid_row.refresh_field("discount_amount_2");
+            child.amount_after_discount_2=child.amount_after_discount_1-child.discount_amount_2
             grid_row.refresh_field("amount_after_discount_2");
-            grid_row.refresh_field("rate");
+
+            child.discount_amount=child.discount_amount_1+child.discount_amount_2
+            grid_row.refresh_field("discount_amount");
+
+            child.discount_percentage=(child.discount_amount*child.price_list_rate)/100
+            grid_row.refresh_field("discount_percentage");
             
-            if(amount_after_discount_2){
-                discount_amount=child.price_list_rate-child.amount_after_discount_2
-                child.discount_amount=discount_amount
-                discount_per = (discount_amount/child.rate)*100
-                child.discount_percentage = discount_per
-                
-                grid_row.refresh_field("discount_percentage")
-                grid_row.refresh_field("discount_amount")
-            }   
+            if(child.amount_after_discount_2){
+                child.rate=child.amount_after_discount_2
+                grid_row.refresh_field("rate");
+            }
+            else{
+                child.rate=child.amount_after_discount_1
+                grid_row.refresh_field("rate");
+            }
+
+            child.amount=child.rate*child.qty
+            grid_row.refresh_field("amount");  
         }
     },
     item_code:function(frm,cdt,cdn){
@@ -51,6 +54,8 @@ frappe.ui.form.on("Sales Order Item", {
         if(child.discount_percentage){
             child.discount_1_=child.discount_percentage 
             grid_row.refresh_field("discount_1_");
+            child.discount_amount_1=((child.price_list_rate*child.discount_1_)/100)
+            grid_row.refresh_field("discount_amount_1");
             child.amount_after_discount_1=child.price_list_rate-((child.price_list_rate*child.discount_1_)/100)
             grid_row.refresh_field("amount_after_discount_1");
         }
@@ -87,6 +92,7 @@ frappe.ui.form.on("Sales Order Item", {
                 }
             })
         }
+
     },
     rate:function(frm,cdt,cdn){
         var child=locals[cdt][cdn]
@@ -95,20 +101,24 @@ frappe.ui.form.on("Sales Order Item", {
         if(child.amount_after_discount_2 && child.discount_2){
             child.discount_2=0
             child.amount_after_discount_2=0
+            child.discount_amount_2=0
             grid_row.refresh_field("discount_2");
+            grid_row.refresh_field("discount_amount_2");
             grid_row.refresh_field("amount_after_discount_2");
 
-            var difference_amount=0
-            var difference_amount_2=0
-            var discount_percentage=0
-            difference_amount= child.rate-child.price_list_rate
-            difference_amount_2= (child.rate+child.price_list_rate)/2
-            discount_percentage= (difference_amount/difference_amount_2)*100
+            child.discount_amount_1=child.rate-child.price_list_rate
+            grid_row.refresh_field("discount_amount_1");
 
-            child.discount_1_=discount_percentage
+            child.discount_1_=(child.discount_amount_1/child.rate)*100
             grid_row.refresh_field("discount_1_");
+
             child.amount_after_discount_1=child.rate
             grid_row.refresh_field("amount_after_discount_1");
+            child.discount_percentage=child.discount_1_
+            grid_row.refresh_field("discount_percentage");
+            child.discount_amount=child.discount_amount_1
+            grid_row.refresh_field("discount_amount");
+            console.log(child.margin_rate_or_amount)
         }
     }
 

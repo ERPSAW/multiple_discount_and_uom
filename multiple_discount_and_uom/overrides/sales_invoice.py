@@ -13,3 +13,13 @@ def get_uom_item_list(item_code):
 def get_conversion_factor(item_code,uom):
     conversion_factor=frappe.db.get_value('UOM Conversion Detail',{'parent':item_code,'uom':uom}, 'conversion_factor')
     return conversion_factor
+
+def set_discount(doc,method=None):
+    if doc.items:
+        for each in doc.items:
+            if each.amount_after_discount_2 :
+                each.rate=each.amount_after_discount_2
+                each.amount=each.amount_after_discount_2*each.qty
+            else:
+                each.rate=each.amount_after_discount_1
+                each.amount=each.amount_after_discount_1*each.qty

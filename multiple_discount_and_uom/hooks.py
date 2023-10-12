@@ -53,6 +53,7 @@ fixtures = ['Translation',
         ]
     }
 ]
+
 # application home page (will override Website Settings)
 # home_page = "login"
 
@@ -134,13 +135,17 @@ fixtures = ['Translation',
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Sales Order": {
+		"validate": "multiple_discount_and_uom.overrides.sales_invoice.set_discount",
+	},
+    "Sales Invoice": {
+		"validate": "multiple_discount_and_uom.overrides.sales_invoice.set_discount",
+	},
+    "Delivery Note": {
+		"validate": "multiple_discount_and_uom.overrides.sales_invoice.set_discount",
+	}
+}
 
 # Scheduled Tasks
 # ---------------
