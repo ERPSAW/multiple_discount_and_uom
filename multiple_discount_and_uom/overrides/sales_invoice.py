@@ -1,5 +1,5 @@
 import frappe
-
+from frappe.utils import flt
 @frappe.whitelist()
 def get_uom_item_list(item_code):
     secondary_uom_list=None
@@ -23,3 +23,14 @@ def set_discount(doc,method=None):
             else:
                 each.rate=each.amount_after_discount_1
                 each.amount=each.amount_after_discount_1*each.qty
+            each.discount_amount=each.custom_discount_amount1+each.custom_discount_amount2
+            each.discount_percentage = flt(
+					(1 - flt(each.rate) / flt(each.price_list_rate)) * 100.0,
+					each.precision("discount_percentage"),
+				)
+            each.base_rate=each.rate
+            each.net_rate=each.rate
+            each.base_net_rate=each.rate
+            each.base_amount=each.amount
+            each.net_amount=each.amount
+            each.base_net_amount=each.amount
