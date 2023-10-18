@@ -23,7 +23,7 @@ frappe.ui.form.on("Sales Invoice Item", {
     discount_1_:function(frm,cdt,cdn){
         var child=locals[cdt][cdn];
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
-        if(child.discount_1_){
+        if(child.discount_1_>0){
              //calculate Rate after discount1 
              child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
              grid_row.refresh_field("amount_after_discount_1");
@@ -51,7 +51,7 @@ frappe.ui.form.on("Sales Invoice Item", {
     discount_2:function(frm,cdt,cdn){
         var child=locals[cdt][cdn];
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
-        if(child.discount_2){
+        if(child.discount_2>0){
             calculate_discount_2(child,grid_row)
            
             //total discount amount
@@ -73,8 +73,6 @@ frappe.ui.form.on("Sales Invoice Item", {
     price_list_rate:function(frm,cdt,cdn){
         var child=locals[cdt][cdn]
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
-            child.discount_1_=child.discount_percentage 
-            grid_row.refresh_field("discount_1_");
             if(child.discount_1_>0){
                 //calculate Rate after discount 
                 child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
@@ -147,7 +145,7 @@ frappe.ui.form.on("Sales Invoice Item", {
             grid_row.refresh_field("discount_2");
             grid_row.refresh_field("discount_amount_2");
             grid_row.refresh_field("amount_after_discount_2");
-            //caluclate discount amount
+            //calculate discount amount
             child.custom_discount_amount1=child.price_list_rate-child.amount_after_discount_1
             grid_row.refresh_field("custom_discount_amount1");
 
@@ -191,7 +189,7 @@ function set_atlternate_qty(frm,cdt,cdn){
 }
 
 function update_total_discount_amount(child,grid_row){
-    child.discount_amount=child.discount_amount_1+child.discount_amount_2
+    child.discount_amount=child.custom_discount_amount_1+child.custom_discount_amount_2
     grid_row.refresh_field("discount_amount");
 
     child.discount_percentage=((child.price_list_rate-child.amount_after_discount_2)/child.price_list_rate) * 100

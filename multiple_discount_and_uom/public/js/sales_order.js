@@ -1,32 +1,4 @@
 frappe.ui.form.on("Sales Order Item", {
-    discount_2:function(frm,cdt,cdn){
-        var child=locals[cdt][cdn];
-        var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
-        if(child.discount_2){
-            child.discount_amount_2=((child.amount_after_discount_1*child.discount_2)/100)
-            grid_row.refresh_field("discount_amount_2");
-            child.amount_after_discount_2=child.amount_after_discount_1-child.discount_amount_2
-            grid_row.refresh_field("amount_after_discount_2");
-
-            child.discount_amount=child.discount_amount_1+child.discount_amount_2
-            grid_row.refresh_field("discount_amount");
-
-            child.discount_percentage=(child.discount_amount*child.price_list_rate)/100
-            grid_row.refresh_field("discount_percentage");
-            
-            if(child.amount_after_discount_2){
-                child.rate=child.amount_after_discount_2
-                grid_row.refresh_field("rate");
-            }
-            else{
-                child.rate=child.amount_after_discount_1
-                grid_row.refresh_field("rate");
-            }
-
-            child.amount=child.rate*child.qty
-            grid_row.refresh_field("amount");  
-        }
-    },
     item_code:function(frm,cdt,cdn){
         var child=locals[cdt][cdn]
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
@@ -48,18 +20,88 @@ frappe.ui.form.on("Sales Order Item", {
             })
         }
     },
+    discount_1_:function(frm,cdt,cdn){
+        var child=locals[cdt][cdn];
+        var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
+        if(child.discount_1_>0){
+             //calculate Rate after discount1 
+             child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
+             grid_row.refresh_field("amount_after_discount_1");
+            //caluclate discount amount1
+              child.discount_amount_1=child.price_list_rate-child.amount_after_discount_1
+              grid_row.refresh_field("discount_amount_1");
+           
+            calculate_discount_2(child,grid_row)
+                //total discount amount
+            update_total_discount_amount(child,grid_row)
+
+            if(child.amount_after_discount_1){
+                child.rate=child.amount_after_discount_1
+                grid_row.refresh_field("rate");
+            }
+            else{
+                child.rate=child.price_list_rate
+                grid_row.refresh_field("rate");
+            }
+
+            child.amount=child.rate*child.qty
+            grid_row.refresh_field("amount");  
+        }
+        },
+    discount_2:function(frm,cdt,cdn){
+        var child=locals[cdt][cdn];
+        var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
+        if(child.discount_2>0){
+            calculate_discount_2(child,grid_row)
+           
+            //total discount amount
+            update_total_discount_amount(child,grid_row)
+
+            if(child.amount_after_discount_2){
+                child.rate=child.amount_after_discount_2
+                grid_row.refresh_field("rate");
+            }
+            else{
+                child.rate=child.amount_after_discount_1
+                grid_row.refresh_field("rate");
+            }
+
+            child.amount=child.rate*child.qty
+            grid_row.refresh_field("amount");  
+        }
+    },
     price_list_rate:function(frm,cdt,cdn){
         var child=locals[cdt][cdn]
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
-        if(child.discount_percentage){
-            child.discount_1_=child.discount_percentage 
-            grid_row.refresh_field("discount_1_");
-            child.discount_amount_1=((child.price_list_rate*child.discount_1_)/100)
-            grid_row.refresh_field("discount_amount_1");
-            child.amount_after_discount_1=child.price_list_rate-((child.price_list_rate*child.discount_1_)/100)
+        child.discount_1_=child.discount_percentage 
+        grid_row.refresh_field("discount_1_");
+        if(child.discount_1_>0){
+            //calculate Rate after discount 
+            child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
             grid_row.refresh_field("amount_after_discount_1");
+            //caluclate discount amount
+            child.discount_amount_1=child.price_list_rate-child.amount_after_discount_1
+            grid_row.refresh_field("custom_discount_amount_1");
         }
-    },
+        else{
+            child.amount_after_discount_1= child.price_list_rate
+                grid_row.refresh_field("amount_after_discount_1");
+                child.rate=child.amount_after_discount_1
+                grid_row.refresh_field("rate");
+        }
+        if(child.discount_2>0){
+            calculate_discount_2(child,grid_row)
+        }
+        else{
+                child.amount_after_discount_2= child.amount_after_discount_1
+                grid_row.refresh_field("amount_after_discount_2");
+                child.rate=child.amount_after_discount_1
+                grid_row.refresh_field("rate");
+        }
+            child.amount=child.rate*child.qty
+            grid_row.refresh_field("amount");      
+        
+},
     alternate_uom:function(frm,cdt,cdn){
         set_atlternate_qty(frm,cdt,cdn)
     },
@@ -106,7 +148,8 @@ frappe.ui.form.on("Sales Order Item", {
             grid_row.refresh_field("discount_amount_2");
             grid_row.refresh_field("amount_after_discount_2");
 
-            child.discount_amount_1=child.rate-child.price_list_rate
+            //calculate discount amount
+            child.discount_amount_1=child.price_list_rate-child.amount_after_discount_1
             grid_row.refresh_field("discount_amount_1");
 
             child.discount_1_=(child.discount_amount_1/child.rate)*100
@@ -114,11 +157,8 @@ frappe.ui.form.on("Sales Order Item", {
 
             child.amount_after_discount_1=child.rate
             grid_row.refresh_field("amount_after_discount_1");
-            child.discount_percentage=child.discount_1_
-            grid_row.refresh_field("discount_percentage");
-            child.discount_amount=child.discount_amount_1
-            grid_row.refresh_field("discount_amount");
-            console.log(child.margin_rate_or_amount)
+            
+            update_total_discount_amount(child,grid_row)
         }
     }
 
@@ -150,4 +190,23 @@ function set_atlternate_qty(frm,cdt,cdn){
             }
         })
     }
+}
+
+
+function update_total_discount_amount(child,grid_row){
+    child.discount_amount=child.discount_amount_1+child.discount_amount_2
+    grid_row.refresh_field("discount_amount");
+
+    child.discount_percentage=((child.price_list_rate-child.amount_after_discount_2)/child.price_list_rate) * 100
+    grid_row.refresh_field("discount_percentage");
+}
+
+function calculate_discount_2(child,grid_row){
+     //to calculate rate after discount2
+     child.amount_after_discount_2=(child.amount_after_discount_1-((child.amount_after_discount_1*(child.discount_2/100))))
+     grid_row.refresh_field("amount_after_discount_2");
+
+     //calculate discount amount2
+     child.discount_amount_2=child.amount_after_discount_1-child.amount_after_discount_2
+     grid_row.refresh_field("discount_amount_2");
 }
