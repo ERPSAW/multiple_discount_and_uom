@@ -24,10 +24,7 @@ def set_discount(doc,method=None):
                 each.rate=each.amount_after_discount_1
                 each.amount=each.amount_after_discount_1*each.qty
             each.discount_amount=each.custom_discount_amount1+each.custom_discount_amount2
-            each.discount_percentage = flt(
-					(1 - flt(each.rate) / flt(each.price_list_rate)) * 100.0,
-					each.precision("discount_percentage"),
-				)
+            each.discount_percentage = ((flt(each.price_list_rate)-flt(each.amount_after_discount_2))/each.price_list_rate) * 100
             each.base_rate=each.rate
             each.net_rate=each.rate
             each.base_net_rate=each.rate
