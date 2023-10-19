@@ -17,22 +17,18 @@ def get_conversion_factor(item_code,uom):
 def set_discount(doc,method=None):
     if doc.items:
         for each in doc.items:
-            if each.amount_after_discount_2 :
-                each.rate=each.amount_after_discount_2
-                each.amount=each.amount_after_discount_2*each.qty
-            else:
-                each.rate=each.amount_after_discount_1
-                each.amount=each.amount_after_discount_1*each.qty
-        each.discount_percentage = ((flt(each.price_list_rate)-flt(each.amount_after_discount_2))/each.price_list_rate) * 100
-        if doc.doctype =="Sales Invoice" :
-            each.discount_amount=each.custom_discount_amount1+each.custom_discount_amount2    
-        elif doc.doctype=="Sales Order":
-            each.discount_amount=each.discount_amount_1+each.discount_amount_2
-        elif doc.doctype=="Delivery Note":
-            each.discount_amount=each.custom_discount_amount_1+each.custom_discount_amount_2   
-        each.base_rate=each.rate
-        each.net_rate=each.rate
-        each.base_net_rate=each.rate
-        each.base_amount=each.amount
-        each.net_amount=each.amount
-        each.base_net_amount=each.amount
+            each.rate=each.amount_after_discount_2
+            each.amount=each.amount_after_discount_2*each.qty
+            each.discount_percentage = ((flt(each.price_list_rate)-flt(each.amount_after_discount_2))/each.price_list_rate) * 100
+            if doc.doctype =="Sales Invoice" :
+                each.discount_amount=each.custom_discount_amount1+each.custom_discount_amount2    
+            elif doc.doctype=="Sales Order":
+                each.discount_amount=each.discount_amount_1+each.discount_amount_2
+            elif doc.doctype=="Delivery Note":
+                each.discount_amount=each.custom_discount_amount_1+each.custom_discount_amount_2   
+            each.base_rate=each.rate
+            each.net_rate=each.rate
+            each.base_net_rate=each.rate
+            each.base_amount=each.amount
+            each.net_amount=each.amount
+            each.base_net_amount=each.amount
