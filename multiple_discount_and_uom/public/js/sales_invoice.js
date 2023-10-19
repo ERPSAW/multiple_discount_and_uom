@@ -73,6 +73,8 @@ frappe.ui.form.on("Sales Invoice Item", {
     price_list_rate:function(frm,cdt,cdn){
         var child=locals[cdt][cdn]
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
+        child.discount_1_=child.discount_percentage 
+        grid_row.refresh_field("discount_1_");
             if(child.discount_1_>0){
                 //calculate Rate after discount 
                 child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
