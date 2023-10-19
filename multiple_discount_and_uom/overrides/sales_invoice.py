@@ -32,3 +32,7 @@ def set_discount(doc,method=None):
             each.base_amount=each.amount
             each.net_amount=each.amount
             each.base_net_amount=each.amount
+
+
+def apply_pricing_rule_on_items(self, item, pricing_rule_args):
+    pass
