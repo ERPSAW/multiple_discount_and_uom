@@ -24,12 +24,7 @@ frappe.ui.form.on("Delivery Note Item", {
         var child=locals[cdt][cdn];
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
         if(child.discount_1_>0){
-             //calculate Rate after discount1 
-             child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
-             grid_row.refresh_field("amount_after_discount_1");
-            //caluclate discount amount1
-              child.custom_discount_amount_1=child.price_list_rate-child.amount_after_discount_1
-              grid_row.refresh_field("custom_discount_amount_1");
+            calculate_discount_amount1(child,grid_row)
            
             calculate_discount_2(child,grid_row)
                 //total discount amount
@@ -73,12 +68,7 @@ frappe.ui.form.on("Delivery Note Item", {
         var child=locals[cdt][cdn]
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
         if(child.discount_1_>0){
-            //calculate Rate after discount 
-            child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
-            grid_row.refresh_field("amount_after_discount_1");
-            //caluclate discount amount
-            child.custom_discount_amount_1=child.price_list_rate-child.amount_after_discount_1
-            grid_row.refresh_field("custom_discount_amount_1");
+            calculate_discount_amount1(child,grid_row)
         }
         else{
             child.amount_after_discount_1= child.price_list_rate
@@ -138,24 +128,6 @@ frappe.ui.form.on("Delivery Note Item", {
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
 
         if(child.amount_after_discount_2 && child.discount_2){
-            child.discount_2=0
-            child.amount_after_discount_2=0
-            child.custom_discount_amount_2=0
-            grid_row.refresh_field("discount_2");
-            grid_row.refresh_field("custom_discount_amount_2");
-            grid_row.refresh_field("amount_after_discount_2");
-
-           
-            //calculate discount amount
-            child.discount_amount_1=child.price_list_rate-child.amount_after_discount_1
-            grid_row.refresh_field("discount_amount_1");
-
-            child.discount_1_=(child.discount_amount_1/child.rate)*100
-            grid_row.refresh_field("discount_1_");
-
-            child.amount_after_discount_1=child.rate
-            grid_row.refresh_field("amount_after_discount_1");
-            
             update_total_discount_amount(child,grid_row)
         }
     }
@@ -207,4 +179,13 @@ function calculate_discount_2(child,grid_row){
      //calculate discount amount2
      child.custom_discount_amount_2=child.amount_after_discount_1-child.amount_after_discount_2
      grid_row.refresh_field("custom_discount_amount_2");
+}
+
+function calculate_discount_amount1(child,grid_row){
+    //calculate Rate after discount1 
+    child.amount_after_discount_1=(child.price_list_rate-((child.price_list_rate*(child.discount_1_/100))))
+    grid_row.refresh_field("amount_after_discount_1");
+   //caluclate discount amount1
+     child.custom_discount_amount_1=child.price_list_rate-child.amount_after_discount_1
+     grid_row.refresh_field("custom_discount_amount_1");
 }

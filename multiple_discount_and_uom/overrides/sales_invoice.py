@@ -30,4 +30,5 @@ def set_discount(doc,method=None):
 
 
 def apply_pricing_rule_on_items(self, item, pricing_rule_args):
-    pass
+    set_discount(doc=self,method=None)
+    
