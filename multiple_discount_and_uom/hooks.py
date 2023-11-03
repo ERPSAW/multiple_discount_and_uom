@@ -128,7 +128,9 @@ fixtures = ['Translation',
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Sales Order": "multiple_discount_and_uom.overrides.sales_order.CustomSalesOrder"
+	"Sales Order": "multiple_discount_and_uom.overrides.sales_order.CustomSalesOrder",
+    "Sales Invoice": "multiple_discount_and_uom.overrides.sales_invoice.CustomSalesInvoice",
+    "Delivery Note": "multiple_discount_and_uom.overrides.delivery_note.CustomDeliveryNote"
 }
 
 # Document Events

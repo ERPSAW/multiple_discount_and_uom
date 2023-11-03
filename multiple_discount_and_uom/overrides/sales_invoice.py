@@ -1,5 +1,15 @@
 import frappe
 from frappe.utils import flt
+from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
+
+class CustomSalesInvoice(SalesInvoice):
+    @frappe.whitelist()
+    def set_rate(self):
+        if self.items:
+            for each in self.items:
+                each.rate=each.amount_after_discount_2
+                each.amount = each.qty*each.rate
+
 @frappe.whitelist()
 def get_uom_item_list(item_code):
     secondary_uom_list=None

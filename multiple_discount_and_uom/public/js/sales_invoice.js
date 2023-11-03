@@ -133,9 +133,20 @@ frappe.ui.form.on("Sales Invoice Item", {
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
         if(child.amount_after_discount_2>0 && child.discount_2>0){
             update_total_discount_amount(child,grid_row)
+            set_discount_rate(frm,child,grid_row)
         }
     }
 })
+
+function set_discount_rate(frm,child,grid_row){
+    frappe.call({
+        method: "set_rate",
+        doc: frm.doc,
+        callback: function(data) {
+            refresh_field("items");
+        }
+    });
+}
 
 function set_atlternate_qty(frm,cdt,cdn){
     var child=locals[cdt][cdn]
