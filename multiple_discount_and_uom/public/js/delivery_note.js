@@ -97,7 +97,9 @@ frappe.ui.form.on("Delivery Note Item", {
         var grid_row = cur_frm.fields_dict['items'].grid.grid_rows_by_docname[child.name];
         if(child.alternate_qty && child.alternate_uom_conversion_factor){
             child.qty = child.alternate_qty *child.alternate_uom_conversion_factor
+            child.amount = child.qty * child.rate
             grid_row.refresh_field("qty");
+            grid_row.refresh_field("amount")
         }
     },
     qty:function(frm,cdt,cdn){
